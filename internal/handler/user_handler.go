@@ -38,6 +38,14 @@ func RegisterRoutes(r *gin.Engine, db *sql.DB) {
 			return
 		}
 
-		c.JSON(200, user)
+		token, err := service.GenerateToken(user.ID, user.Role)
+		if err != nil {
+			c.JSON(500, gin.H{"error": "could not generate token"})
+			return
+		}
+
+		c.JSON(200, gin.H{
+			"token": token,
+		})
 	})
 }
