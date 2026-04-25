@@ -14,8 +14,8 @@ import (
 
 type mockCarSvc struct {
 	createErr       error
-	getAllCars       []models.Car
-	getAllErr        error
+	getAllCars      []models.Car
+	getAllErr       error
 	getByIDCar      *models.Car
 	getByIDErr      error
 	getByUserIDCars []models.Car
@@ -24,14 +24,14 @@ type mockCarSvc struct {
 	deleteErr       error
 }
 
-func (m *mockCarSvc) Create(_ *models.Car) error              { return m.createErr }
-func (m *mockCarSvc) GetAll() ([]models.Car, error)           { return m.getAllCars, m.getAllErr }
-func (m *mockCarSvc) GetByID(_ int) (*models.Car, error)      { return m.getByIDCar, m.getByIDErr }
+func (m *mockCarSvc) Create(_ *models.Car) error         { return m.createErr }
+func (m *mockCarSvc) GetAll() ([]models.Car, error)      { return m.getAllCars, m.getAllErr }
+func (m *mockCarSvc) GetByID(_ int) (*models.Car, error) { return m.getByIDCar, m.getByIDErr }
 func (m *mockCarSvc) GetByUserID(_ int) ([]models.Car, error) {
 	return m.getByUserIDCars, m.getByUserIDErr
 }
 func (m *mockCarSvc) Update(_ *models.Car) error { return m.updateErr }
-func (m *mockCarSvc) Delete(_ int) error          { return m.deleteErr }
+func (m *mockCarSvc) Delete(_ int) error         { return m.deleteErr }
 
 // injetaUserID simula o middleware de autenticação nos testes
 func injetaUserID(userID int) gin.HandlerFunc {

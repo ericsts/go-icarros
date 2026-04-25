@@ -19,14 +19,14 @@ type mockCarRepo struct {
 	deleteErr        error
 }
 
-func (m *mockCarRepo) Create(_ *models.Car) error              { return m.createErr }
-func (m *mockCarRepo) FindAll() ([]models.Car, error)          { return m.findAllCars, m.findAllErr }
-func (m *mockCarRepo) FindByID(_ int) (*models.Car, error)     { return m.findByIDCar, m.findByIDErr }
+func (m *mockCarRepo) Create(_ *models.Car) error          { return m.createErr }
+func (m *mockCarRepo) FindAll() ([]models.Car, error)      { return m.findAllCars, m.findAllErr }
+func (m *mockCarRepo) FindByID(_ int) (*models.Car, error) { return m.findByIDCar, m.findByIDErr }
 func (m *mockCarRepo) FindByUserID(_ int) ([]models.Car, error) {
 	return m.findByUserIDCars, m.findByUserIDErr
 }
 func (m *mockCarRepo) Update(_ *models.Car) error { return m.updateErr }
-func (m *mockCarRepo) Delete(_ int) error          { return m.deleteErr }
+func (m *mockCarRepo) Delete(_ int) error         { return m.deleteErr }
 
 func TestCarService_Create(t *testing.T) {
 	svc := &CarService{Repo: &mockCarRepo{}}
