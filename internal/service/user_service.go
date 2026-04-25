@@ -31,3 +31,19 @@ func (s *UserService) Login(email, password string) (*models.User, error) {
 
 	return user, nil
 }
+
+func (s *UserService) GetAll() ([]models.User, error) {
+	return s.Repo.FindAll()
+}
+
+func (s *UserService) GetByID(id int) (*models.User, error) {
+	return s.Repo.FindByID(id)
+}
+
+func (s *UserService) Update(user *models.User) error {
+	return s.Repo.Update(user)
+}
+
+func (s *UserService) Delete(id int) error {
+	return s.Repo.Delete(id)
+}
