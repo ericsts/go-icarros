@@ -1,0 +1,105 @@
+# Variáveis globais para facilitar a troca de ambiente
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+
+### ─────────────────────────────────────────
+### AUTH
+### ─────────────────────────────────────────
+
+### POST - Login (copie o token retornado e cole em @token abaixo)
+POST {{baseUrl}}/login
+Content-Type: {{contentType}}
+
+{
+    "email": "ericsts@gmail.com",
+    "password": "q1w2e3r4t5"
+}
+
+### Cole o token aqui após o login:
+@token = COLE_O_TOKEN_AQUI
+
+
+### ─────────────────────────────────────────
+### USERS (apenas admin)
+### ─────────────────────────────────────────
+
+### POST - Criar usuário admin
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+    "name": "Eric",
+    "email": "ericsts@gmail.com",
+    "password": "q1w2e3r4t5",
+    "role": "admin"
+}
+
+### GET - Listar todos os usuários
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+
+### GET - Buscar usuário por ID
+GET {{baseUrl}}/users/1
+Authorization: Bearer {{token}}
+
+### PUT - Atualizar usuário
+PUT {{baseUrl}}/users/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+    "name": "Eric Luiz",
+    "email": "ericsts@gmail.com",
+    "role": "admin"
+}
+
+### DELETE - Remover usuário
+DELETE {{baseUrl}}/users/1
+Authorization: Bearer {{token}}
+
+
+### ─────────────────────────────────────────
+### CARS (qualquer usuário autenticado)
+### ─────────────────────────────────────────
+
+### POST - Cadastrar carro
+POST {{baseUrl}}/cars
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+    "marca": "Volkswagen",
+    "modelo": "Golf",
+    "ano": 2024,
+    "valor": 120000.00
+}
+
+### GET - Listar todos os carros
+GET {{baseUrl}}/cars
+Authorization: Bearer {{token}}
+
+### GET - Meus carros
+GET {{baseUrl}}/cars/my
+Authorization: Bearer {{token}}
+
+### GET - Buscar carro por ID
+GET {{baseUrl}}/cars/1
+Authorization: Bearer {{token}}
+
+### PUT - Atualizar carro
+PUT {{baseUrl}}/cars/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+    "marca": "Volkswagen",
+    "modelo": "Golf GTI",
+    "ano": 2024,
+    "valor": 150000.00
+}
+
+### DELETE - Remover carro
+DELETE {{baseUrl}}/cars/1
+Authorization: Bearer {{token}}
