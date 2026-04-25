@@ -14,7 +14,7 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 
-		if authHeader == "" {
+		if !strings.HasPrefix(authHeader, "Bearer ") {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}

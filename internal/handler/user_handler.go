@@ -11,7 +11,7 @@ import (
 )
 
 type UserHandler struct {
-	Service *service.UserService
+	Service UserSvc
 }
 
 func (h *UserHandler) Login(c *gin.Context) {

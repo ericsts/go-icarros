@@ -5,13 +5,12 @@ import (
 	"strconv"
 
 	"go-icarros/internal/models"
-	"go-icarros/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
 
 type CarHandler struct {
-	Service *service.CarService
+	Service CarSvc
 }
 
 func (h *CarHandler) Create(c *gin.Context) {

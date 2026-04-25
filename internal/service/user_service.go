@@ -2,13 +2,12 @@ package service
 
 import (
 	"go-icarros/internal/models"
-	"go-icarros/internal/repository"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
-	Repo *repository.UserRepository
+	Repo UserRepo
 }
 
 func (s *UserService) Register(user *models.User) error {

@@ -1,12 +1,9 @@
 package service
 
-import (
-	"go-icarros/internal/models"
-	"go-icarros/internal/repository"
-)
+import "go-icarros/internal/models"
 
 type CarService struct {
-	Repo *repository.CarRepository
+	Repo CarRepo
 }
 
 func (s *CarService) Create(car *models.Car) error {
