@@ -1,6 +1,6 @@
-FROM golang:1.22
+FROM golang:1.26.2
 WORKDIR /app
 COPY . .
 RUN go mod tidy
-RUN go build -o main .
+RUN go build -o main ./cmd
 CMD ["./main"]
