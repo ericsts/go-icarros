@@ -33,6 +33,27 @@ func (m *mockCarSvc) GetByUserID(_ int) ([]models.Car, error) {
 func (m *mockCarSvc) Update(_ *models.Car) error { return m.updateErr }
 func (m *mockCarSvc) Delete(_ int) error         { return m.deleteErr }
 
+// mockLogger e mockPublisher são compartilhados com auction_handler_test.go (mesmo pacote).
+type mockLogger struct{}
+
+func (m *mockLogger) Info(_ string, _ string, _ map[string]any)  {}
+func (m *mockLogger) Warn(_ string, _ string, _ map[string]any)  {}
+func (m *mockLogger) Error(_ string, _ string, _ map[string]any) {}
+
+type mockPublisher struct{}
+
+func (m *mockPublisher) Publish(_ string, _ []byte) error { return nil }
+
+// mockAuctionSvc é definido em auction_handler_test.go (mesmo pacote).
+func newCarHandler(carSvc *mockCarSvc) *CarHandler {
+	return &CarHandler{
+		Service:    carSvc,
+		AuctionSvc: &mockAuctionSvc{},
+		Logger:     &mockLogger{},
+		Publisher:  &mockPublisher{},
+	}
+}
+
 // injetaUserID simula o middleware de autenticação nos testes
 func injetaUserID(userID int) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -42,7 +63,7 @@ func injetaUserID(userID int) gin.HandlerFunc {
 }
 
 func TestCarHandler_Create_Sucesso(t *testing.T) {
-	h := &CarHandler{Service: &mockCarSvc{}}
+	h := newCarHandler(&mockCarSvc{})
 	r := newTestRouter()
 	r.POST("/cars", injetaUserID(1), h.Create)
 
@@ -59,7 +80,7 @@ func TestCarHandler_Create_Sucesso(t *testing.T) {
 }
 
 func TestCarHandler_Create_DefineUserID(t *testing.T) {
-	h := &CarHandler{Service: &mockCarSvc{}}
+	h := newCarHandler(&mockCarSvc{})
 	r := newTestRouter()
 	r.POST("/cars", injetaUserID(7), h.Create)
 
@@ -77,7 +98,7 @@ func TestCarHandler_Create_DefineUserID(t *testing.T) {
 }
 
 func TestCarHandler_Create_ErroService(t *testing.T) {
-	h := &CarHandler{Service: &mockCarSvc{createErr: errors.New("db error")}}
+	h := newCarHandler(&mockCarSvc{createErr: errors.New("db error")})
 	r := newTestRouter()
 	r.POST("/cars", injetaUserID(1), h.Create)
 
@@ -93,7 +114,7 @@ func TestCarHandler_Create_ErroService(t *testing.T) {
 }
 
 func TestCarHandler_List(t *testing.T) {
-	h := &CarHandler{Service: &mockCarSvc{getAllCars: []models.Car{{ID: 1}, {ID: 2}}}}
+	h := newCarHandler(&mockCarSvc{getAllCars: []models.Car{{ID: 1}, {ID: 2}}})
 	r := newTestRouter()
 	r.GET("/cars", h.List)
 
@@ -113,7 +134,7 @@ func TestCarHandler_List(t *testing.T) {
 }
 
 func TestCarHandler_GetByID_Sucesso(t *testing.T) {
-	h := &CarHandler{Service: &mockCarSvc{getByIDCar: &models.Car{ID: 1, Marca: "Fiat"}}}
+	h := newCarHandler(&mockCarSvc{getByIDCar: &models.Car{ID: 1, Marca: "Fiat"}})
 	r := newTestRouter()
 	r.GET("/cars/:id", h.GetByID)
 
@@ -128,7 +149,7 @@ func TestCarHandler_GetByID_Sucesso(t *testing.T) {
 }
 
 func TestCarHandler_GetByID_NaoEncontrado(t *testing.T) {
-	h := &CarHandler{Service: &mockCarSvc{getByIDErr: errors.New("not found")}}
+	h := newCarHandler(&mockCarSvc{getByIDErr: errors.New("not found")})
 	r := newTestRouter()
 	r.GET("/cars/:id", h.GetByID)
 
@@ -143,7 +164,7 @@ func TestCarHandler_GetByID_NaoEncontrado(t *testing.T) {
 }
 
 func TestCarHandler_GetMyCars(t *testing.T) {
-	h := &CarHandler{Service: &mockCarSvc{getByUserIDCars: []models.Car{{ID: 1}, {ID: 2}}}}
+	h := newCarHandler(&mockCarSvc{getByUserIDCars: []models.Car{{ID: 1}, {ID: 2}}})
 	r := newTestRouter()
 	r.GET("/cars/my", injetaUserID(1), h.GetMyCars)
 
@@ -163,7 +184,7 @@ func TestCarHandler_GetMyCars(t *testing.T) {
 }
 
 func TestCarHandler_Update(t *testing.T) {
-	h := &CarHandler{Service: &mockCarSvc{}}
+	h := newCarHandler(&mockCarSvc{})
 	r := newTestRouter()
 	r.PUT("/cars/:id", h.Update)
 
@@ -180,7 +201,7 @@ func TestCarHandler_Update(t *testing.T) {
 }
 
 func TestCarHandler_Delete(t *testing.T) {
-	h := &CarHandler{Service: &mockCarSvc{}}
+	h := newCarHandler(&mockCarSvc{})
 	r := newTestRouter()
 	r.DELETE("/cars/:id", h.Delete)
 

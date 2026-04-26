@@ -1,6 +1,13 @@
 package handler
 
-import "go-icarros/internal/models"
+import (
+	"time"
+
+	"go-icarros/internal/models"
+	"go-icarros/internal/service"
+)
+
+// --- interfaces de serviço consumidas pelos handlers ---
 
 type UserSvc interface {
 	Register(user *models.User) error
@@ -19,3 +26,19 @@ type CarSvc interface {
 	Update(car *models.Car) error
 	Delete(id int) error
 }
+
+type AuctionSvc interface {
+	CreateForCar(carID int, endsAt time.Time, minBid float64) (*models.Auction, error)
+	GetAll() ([]models.Auction, error)
+	GetByID(id int) (*models.Auction, error)
+	PlaceBid(auctionID, userID int, amount float64) (*models.Bid, error)
+	GetBids(auctionID int) ([]models.Bid, error)
+}
+
+type LogSvc interface {
+	GetAll(level, event string, limit int) ([]models.EventLog, error)
+}
+
+// Logger e Publisher são reutilizados do pacote service para evitar duplicação.
+type Logger = service.Logger
+type Publisher = service.Publisher

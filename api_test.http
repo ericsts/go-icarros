@@ -13,11 +13,11 @@ Content-Type: {{contentType}}
 
 {
     "email": "ericsts@gmail.com",
-    "password": "q1w2e3r4t5"
+    "password": "admin123"
 }
 
 ### Cole o token aqui após o login:
-@token = COLE_O_TOKEN_AQUI
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3NzcyMTE3MTB9._Tb5QCCQm117qFyNWQ4RpbaeD9CbYvSkp01vDB_Bx6U
 
 
 ### ─────────────────────────────────────────
@@ -34,6 +34,18 @@ Authorization: Bearer {{token}}
     "email": "ericsts@gmail.com",
     "password": "q1w2e3r4t5",
     "role": "admin"
+}
+
+### POST - Criar usuário comum
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+    "name": "João Silva",
+    "email": "joao@icarros.com",
+    "password": "senha123",
+    "role": "user"
 }
 
 ### GET - Listar todos os usuários
@@ -56,7 +68,7 @@ Authorization: Bearer {{token}}
 }
 
 ### DELETE - Remover usuário
-DELETE {{baseUrl}}/users/1
+DELETE {{baseUrl}}/users/2
 Authorization: Bearer {{token}}
 
 
@@ -64,16 +76,32 @@ Authorization: Bearer {{token}}
 ### CARS (qualquer usuário autenticado)
 ### ─────────────────────────────────────────
 
-### POST - Cadastrar carro
+### POST - Cadastrar carro (cria leilão automaticamente)
 POST {{baseUrl}}/cars
 Content-Type: {{contentType}}
 Authorization: Bearer {{token}}
 
 {
     "marca": "Volkswagen",
-    "modelo": "Golf",
+    "modelo": "Golf GTI",
     "ano": 2024,
-    "valor": 120000.00
+    "valor": 120000.00,
+    "auction_ends_at": "2026-12-31T23:59:59Z",
+    "min_bid": 100000.00
+}
+
+### POST - Cadastrar segundo carro
+POST {{baseUrl}}/cars
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+    "marca": "Toyota",
+    "modelo": "Corolla",
+    "ano": 2023,
+    "valor": 95000.00,
+    "auction_ends_at": "2026-11-30T23:59:59Z",
+    "min_bid": 80000.00
 }
 
 ### GET - Listar todos os carros
@@ -95,11 +123,105 @@ Authorization: Bearer {{token}}
 
 {
     "marca": "Volkswagen",
-    "modelo": "Golf GTI",
+    "modelo": "Golf GTI 2.0",
     "ano": 2024,
-    "valor": 150000.00
+    "valor": 125000.00
 }
 
-### DELETE - Remover carro
-DELETE {{baseUrl}}/cars/1
+### DELETE - Remover carro (notifica admin por e-mail)
+DELETE {{baseUrl}}/cars/2
 Authorization: Bearer {{token}}
+
+
+### ─────────────────────────────────────────
+### AUCTIONS (qualquer usuário autenticado)
+### ─────────────────────────────────────────
+
+### GET - Listar todos os leilões
+GET {{baseUrl}}/auctions
+Authorization: Bearer {{token}}
+
+### GET - Buscar leilão por ID
+GET {{baseUrl}}/auctions/1
+Authorization: Bearer {{token}}
+
+### POST - Dar um lance
+# O lance deve ser maior que current_bid (ou min_bid se não houver lances ainda)
+POST {{baseUrl}}/auctions/1/bids
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+    "amount": 105000.00
+}
+
+### POST - Segundo lance (maior que o anterior)
+POST {{baseUrl}}/auctions/1/bids
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+    "amount": 110000.00
+}
+
+### POST - Lance inválido (abaixo do lance atual — espera 400)
+POST {{baseUrl}}/auctions/1/bids
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+    "amount": 50000.00
+}
+
+### GET - Lances de um leilão (ordenados do maior para o menor)
+GET {{baseUrl}}/auctions/1/bids
+Authorization: Bearer {{token}}
+
+
+### ─────────────────────────────────────────
+### LOGS (apenas admin)
+### ─────────────────────────────────────────
+
+### GET - Listar todos os logs (últimos 100)
+GET {{baseUrl}}/logs
+Authorization: Bearer {{token}}
+
+### GET - Filtrar por level=error
+GET {{baseUrl}}/logs?level=error
+Authorization: Bearer {{token}}
+
+### GET - Filtrar por level=info
+GET {{baseUrl}}/logs?level=info
+Authorization: Bearer {{token}}
+
+### GET - Filtrar por event (busca parcial)
+GET {{baseUrl}}/logs?event=car
+Authorization: Bearer {{token}}
+
+### GET - Filtrar event=auction
+GET {{baseUrl}}/logs?event=auction
+Authorization: Bearer {{token}}
+
+### GET - Combinar filtros level + event + limit
+GET {{baseUrl}}/logs?level=info&event=car.created&limit=10
+Authorization: Bearer {{token}}
+
+### GET - Logs de notificações de e-mail
+GET {{baseUrl}}/logs?event=notification.email
+Authorization: Bearer {{token}}
+
+
+### ─────────────────────────────────────────
+### WEBSOCKET (lances em tempo real)
+### ─────────────────────────────────────────
+# O REST Client não suporta WebSocket. Para testar, use uma das opções abaixo:
+#
+# Opção 1 — wscat (terminal):
+#   npm install -g wscat
+#   wscat -c "ws://localhost:8080/ws/auctions/1?token={{token}}"
+#
+# Opção 2 — websocat (binário):
+#   websocat "ws://localhost:8080/ws/auctions/1?token={{token}}"
+#
+# Após conectar, cada novo lance em POST /auctions/1/bids aparece em tempo real:
+#   {"id":1,"auction_id":1,"user_id":1,"amount":105000,"created_at":"..."}

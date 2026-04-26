@@ -11,6 +11,20 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # painel web: http://localhost:15672 (guest/guest)
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # inbox web: http://localhost:8025
+
   app:
     build: .
     container_name: go_app
@@ -18,3 +32,7 @@ services:
       - "8080:8080"
     depends_on:
       - db
+      - rabbitmq
+      - mailhog
+    env_file:
+      - .env
