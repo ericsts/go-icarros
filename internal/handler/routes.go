@@ -12,10 +12,10 @@ import (
 )
 
 type Deps struct {
-	DB        *sql.DB
-	Queue     *service.QueueService
-	Logger    *service.LogService
-	Hub       *ws.Hub
+	DB     *sql.DB
+	Queue  *service.QueueService
+	Logger *service.LogService
+	Hub    *ws.Hub
 }
 
 func RegisterRoutes(r *gin.Engine, d Deps) {

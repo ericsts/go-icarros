@@ -14,19 +14,21 @@ type mockAuctionRepo struct {
 	updateStatusErr   error
 }
 
-func (m *mockAuctionRepo) Create(_ *models.Auction) error             { return nil }
-func (m *mockAuctionRepo) FindAll() ([]models.Auction, error)         { return nil, nil }
-func (m *mockAuctionRepo) FindByID(_ int) (*models.Auction, error)    { return nil, nil }
-func (m *mockAuctionRepo) FindExpired() ([]models.Auction, error)     { return m.findExpiredResult, m.findExpiredErr }
-func (m *mockAuctionRepo) UpdateStatus(_ int, _ string) error         { return m.updateStatusErr }
+func (m *mockAuctionRepo) Create(_ *models.Auction) error          { return nil }
+func (m *mockAuctionRepo) FindAll() ([]models.Auction, error)      { return nil, nil }
+func (m *mockAuctionRepo) FindByID(_ int) (*models.Auction, error) { return nil, nil }
+func (m *mockAuctionRepo) FindExpired() ([]models.Auction, error) {
+	return m.findExpiredResult, m.findExpiredErr
+}
+func (m *mockAuctionRepo) UpdateStatus(_ int, _ string) error { return m.updateStatusErr }
 
 type mockBidRepo struct {
 	findHighestResult *models.Bid
 	findHighestErr    error
 }
 
-func (m *mockBidRepo) Create(_ *models.Bid) error                        { return nil }
-func (m *mockBidRepo) FindByAuctionID(_ int) ([]models.Bid, error)       { return nil, nil }
+func (m *mockBidRepo) Create(_ *models.Bid) error                  { return nil }
+func (m *mockBidRepo) FindByAuctionID(_ int) ([]models.Bid, error) { return nil, nil }
 func (m *mockBidRepo) FindHighestByAuctionID(_ int) (*models.Bid, error) {
 	return m.findHighestResult, m.findHighestErr
 }

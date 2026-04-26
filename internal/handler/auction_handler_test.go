@@ -15,8 +15,8 @@ import (
 type mockAuctionSvc struct {
 	createForCarResult *models.Auction
 	createForCarErr    error
-	getAllResult        []models.Auction
-	getAllErr           error
+	getAllResult       []models.Auction
+	getAllErr          error
 	getByIDResult      *models.Auction
 	getByIDErr         error
 	placeBidResult     *models.Bid

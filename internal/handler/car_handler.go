@@ -48,9 +48,9 @@ func (h *CarHandler) Create(c *gin.Context) {
 	}
 
 	meta, _ := json.Marshal(map[string]any{
-		"car_id": input.Car.ID,
-		"marca":  input.Car.Marca,
-		"modelo": input.Car.Modelo,
+		"car_id":  input.Car.ID,
+		"marca":   input.Car.Marca,
+		"modelo":  input.Car.Modelo,
 		"user_id": userID,
 	})
 	h.Publisher.Publish("car.created", meta)
