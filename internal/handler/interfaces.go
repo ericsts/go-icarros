@@ -30,6 +30,7 @@ type CarSvc interface {
 
 type AuctionSvc interface {
 	CreateForCar(carID int, endsAt time.Time, minBid float64) (*models.Auction, error)
+	HasOpenAuction(carID int) (bool, error)
 	GetAll() ([]models.Auction, error)
 	GetByID(id int) (*models.Auction, error)
 	PlaceBid(auctionID, userID int, amount float64) (*models.Bid, error)

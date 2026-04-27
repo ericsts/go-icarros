@@ -14,9 +14,10 @@ type mockAuctionRepo struct {
 	updateStatusErr   error
 }
 
-func (m *mockAuctionRepo) Create(_ *models.Auction) error          { return nil }
-func (m *mockAuctionRepo) FindAll() ([]models.Auction, error)      { return nil, nil }
-func (m *mockAuctionRepo) FindByID(_ int) (*models.Auction, error) { return nil, nil }
+func (m *mockAuctionRepo) Create(_ *models.Auction) error                 { return nil }
+func (m *mockAuctionRepo) FindAll() ([]models.Auction, error)             { return nil, nil }
+func (m *mockAuctionRepo) FindByID(_ int) (*models.Auction, error)        { return nil, nil }
+func (m *mockAuctionRepo) FindOpenByCarID(_ int) (*models.Auction, error) { return nil, nil }
 func (m *mockAuctionRepo) FindExpired() ([]models.Auction, error) {
 	return m.findExpiredResult, m.findExpiredErr
 }

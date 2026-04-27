@@ -31,6 +31,7 @@ type AuctionRepo interface {
 	FindByID(id int) (*models.Auction, error)
 	FindExpired() ([]models.Auction, error)
 	UpdateStatus(id int, status string) error
+	FindOpenByCarID(carID int) (*models.Auction, error)
 }
 
 type BidRepo interface {

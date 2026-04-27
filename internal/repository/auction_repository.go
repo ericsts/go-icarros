@@ -81,3 +81,15 @@ func (r *AuctionRepository) UpdateStatus(id int, status string) error {
 	_, err := r.DB.Exec("UPDATE auctions SET status=$1 WHERE id=$2", status, id)
 	return err
 }
+
+func (r *AuctionRepository) FindOpenByCarID(carID int) (*models.Auction, error) {
+	var a models.Auction
+	err := r.DB.QueryRow(
+		"SELECT id, car_id, ends_at, status, min_bid, created_at FROM auctions WHERE car_id=$1 AND status='open' LIMIT 1",
+		carID,
+	).Scan(&a.ID, &a.CarID, &a.EndsAt, &a.Status, &a.MinBid, &a.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &a, nil
+}

@@ -83,3 +83,11 @@ func (s *AuctionService) PlaceBid(auctionID, userID int, amount float64) (*model
 func (s *AuctionService) GetBids(auctionID int) ([]models.Bid, error) {
 	return s.BidRepo.FindByAuctionID(auctionID)
 }
+
+func (s *AuctionService) HasOpenAuction(carID int) (bool, error) {
+	a, err := s.AuctionRepo.FindOpenByCarID(carID)
+	if err != nil {
+		return false, nil // sem leilão ativo
+	}
+	return a != nil, nil
+}

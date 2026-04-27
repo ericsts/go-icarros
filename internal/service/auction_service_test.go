@@ -9,14 +9,16 @@ import (
 )
 
 type mockAuctionRepo struct {
-	createErr         error
-	findAllResult     []models.Auction
-	findAllErr        error
-	findByIDResult    *models.Auction
-	findByIDErr       error
-	findExpiredResult []models.Auction
-	findExpiredErr    error
-	updateStatusErr   error
+	createErr           error
+	findAllResult       []models.Auction
+	findAllErr          error
+	findByIDResult      *models.Auction
+	findByIDErr         error
+	findExpiredResult   []models.Auction
+	findExpiredErr      error
+	updateStatusErr     error
+	findOpenByCarResult *models.Auction
+	findOpenByCarErr    error
 }
 
 func (m *mockAuctionRepo) Create(_ *models.Auction) error {
@@ -33,6 +35,9 @@ func (m *mockAuctionRepo) FindExpired() ([]models.Auction, error) {
 }
 func (m *mockAuctionRepo) UpdateStatus(_ int, _ string) error {
 	return m.updateStatusErr
+}
+func (m *mockAuctionRepo) FindOpenByCarID(_ int) (*models.Auction, error) {
+	return m.findOpenByCarResult, m.findOpenByCarErr
 }
 
 type mockBidRepo struct {

@@ -56,6 +56,7 @@ func RegisterRoutes(r *gin.Engine, d Deps) {
 
 	// rotas públicas
 	r.POST("/login", userH.Login)
+	r.POST("/register", userH.Register)
 
 	// rotas de admin
 	admin := r.Group("/")

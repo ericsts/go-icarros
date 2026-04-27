@@ -18,9 +18,10 @@ type CarHandler struct {
 	Publisher  Publisher
 }
 
-// createCarInput agrega os campos do carro e do leilão num único body.
-type createCarInput struct {
+// carInput agrega os campos do carro e, opcionalmente, de um leilão.
+type carInput struct {
 	models.Car
+	StartAuction  bool      `json:"start_auction"`
 	AuctionEndsAt time.Time `json:"auction_ends_at"`
 	MinBid        float64   `json:"min_bid"`
 }
@@ -28,10 +29,17 @@ type createCarInput struct {
 func (h *CarHandler) Create(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
-	var input createCarInput
+	var input carInput
 	if err := c.BindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	if input.StartAuction {
+		if input.AuctionEndsAt.IsZero() || input.AuctionEndsAt.Before(time.Now()) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "data de encerramento deve ser no futuro"})
+			return
+		}
 	}
 
 	input.Car.UserID = userID
@@ -40,11 +48,13 @@ func (h *CarHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if _, err := h.AuctionSvc.CreateForCar(input.Car.ID, input.AuctionEndsAt, input.MinBid); err != nil {
-		h.Logger.Warn("auction.create_failed", "falha ao criar leilão para o carro", map[string]any{
-			"car_id": input.Car.ID,
-			"error":  err.Error(),
-		})
+	if input.StartAuction {
+		if _, err := h.AuctionSvc.CreateForCar(input.Car.ID, input.AuctionEndsAt, input.MinBid); err != nil {
+			h.Logger.Warn("auction.create_failed", "falha ao criar leilão para o carro", map[string]any{
+				"car_id": input.Car.ID,
+				"error":  err.Error(),
+			})
+		}
 	}
 
 	meta, _ := json.Marshal(map[string]any{
@@ -101,17 +111,41 @@ func (h *CarHandler) Update(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "id inválido"})
 		return
 	}
-	var car models.Car
-	if err := c.BindJSON(&car); err != nil {
+
+	var input carInput
+	if err := c.BindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	car.ID = id
-	if err := h.Service.Update(&car); err != nil {
+
+	if input.StartAuction {
+		if input.AuctionEndsAt.IsZero() || input.AuctionEndsAt.Before(time.Now()) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "data de encerramento deve ser no futuro"})
+			return
+		}
+		has, _ := h.AuctionSvc.HasOpenAuction(id)
+		if has {
+			c.JSON(http.StatusConflict, gin.H{"error": "este carro já possui um leilão ativo"})
+			return
+		}
+	}
+
+	input.Car.ID = id
+	if err := h.Service.Update(&input.Car); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, car)
+
+	if input.StartAuction {
+		if _, err := h.AuctionSvc.CreateForCar(id, input.AuctionEndsAt, input.MinBid); err != nil {
+			h.Logger.Warn("auction.create_failed", "falha ao criar leilão no update", map[string]any{
+				"car_id": id,
+				"error":  err.Error(),
+			})
+		}
+	}
+
+	c.JSON(http.StatusOK, input.Car)
 }
 
 func (h *CarHandler) Delete(c *gin.Context) {

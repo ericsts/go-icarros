@@ -12,9 +12,13 @@ import (
 
 // mockAuctionSvc implementa AuctionSvc com campos configuráveis.
 // Também é usado em car_handler_test.go (mesmo pacote).
+// mockAuctionSvc implementa AuctionSvc com campos configuráveis.
+// Também é usado em car_handler_test.go (mesmo pacote).
 type mockAuctionSvc struct {
 	createForCarResult *models.Auction
 	createForCarErr    error
+	hasOpenAuction     bool
+	hasOpenAuctionErr  error
 	getAllResult       []models.Auction
 	getAllErr          error
 	getByIDResult      *models.Auction
@@ -27,6 +31,9 @@ type mockAuctionSvc struct {
 
 func (m *mockAuctionSvc) CreateForCar(_ int, _ time.Time, _ float64) (*models.Auction, error) {
 	return m.createForCarResult, m.createForCarErr
+}
+func (m *mockAuctionSvc) HasOpenAuction(_ int) (bool, error) {
+	return m.hasOpenAuction, m.hasOpenAuctionErr
 }
 func (m *mockAuctionSvc) GetAll() ([]models.Auction, error) {
 	return m.getAllResult, m.getAllErr

@@ -42,6 +42,22 @@ func (h *UserHandler) Login(c *gin.Context) {
 	})
 }
 
+// Register é a rota pública de auto-cadastro (sempre cria role "user").
+func (h *UserHandler) Register(c *gin.Context) {
+	var user models.User
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	user.Role = "user"
+	if err := h.Service.Register(&user); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	user.Password = ""
+	c.JSON(http.StatusCreated, user)
+}
+
 func (h *UserHandler) Create(c *gin.Context) {
 	var user models.User
 	if err := c.BindJSON(&user); err != nil {

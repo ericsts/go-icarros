@@ -17,8 +17,8 @@ type mockUserSvc struct {
 	registerErr      error
 	loginUser        *models.User
 	loginErr         error
-	getAllUsers       []models.User
-	getAllErr         error
+	getAllUsers      []models.User
+	getAllErr        error
 	getByIDUser      *models.User
 	getByIDErr       error
 	updateErr        error
@@ -26,13 +26,13 @@ type mockUserSvc struct {
 	deleteErr        error
 }
 
-func (m *mockUserSvc) Register(_ *models.User) error                        { return m.registerErr }
-func (m *mockUserSvc) Login(_, _ string) (*models.User, error)              { return m.loginUser, m.loginErr }
-func (m *mockUserSvc) GetAll() ([]models.User, error)                       { return m.getAllUsers, m.getAllErr }
-func (m *mockUserSvc) GetByID(_ int) (*models.User, error)                  { return m.getByIDUser, m.getByIDErr }
-func (m *mockUserSvc) Update(_ *models.User) error                          { return m.updateErr }
-func (m *mockUserSvc) UpdateProfile(_ *models.User, _ string) error         { return m.updateProfileErr }
-func (m *mockUserSvc) Delete(_ int) error                                   { return m.deleteErr }
+func (m *mockUserSvc) Register(_ *models.User) error                { return m.registerErr }
+func (m *mockUserSvc) Login(_, _ string) (*models.User, error)      { return m.loginUser, m.loginErr }
+func (m *mockUserSvc) GetAll() ([]models.User, error)               { return m.getAllUsers, m.getAllErr }
+func (m *mockUserSvc) GetByID(_ int) (*models.User, error)          { return m.getByIDUser, m.getByIDErr }
+func (m *mockUserSvc) Update(_ *models.User) error                  { return m.updateErr }
+func (m *mockUserSvc) UpdateProfile(_ *models.User, _ string) error { return m.updateProfileErr }
+func (m *mockUserSvc) Delete(_ int) error                           { return m.deleteErr }
 
 func newTestRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)

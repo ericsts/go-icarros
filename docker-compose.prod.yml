@@ -16,7 +16,6 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
-    # Painel RabbitMQ acessível apenas internamente em produção
     expose:
       - "5672"
       - "15672"
@@ -28,16 +27,16 @@ services:
     depends_on:
       - db
       - rabbitmq
-    expose:
-      - "8080"
+    ports:
+      - "127.0.0.1:8080:8080"   # só localhost — nginx do host faz o proxy
 
-  nginx:
+  frontend:
     build: ./frontend
     restart: unless-stopped
-    ports:
-      - "80:80"
     depends_on:
       - app
+    ports:
+      - "127.0.0.1:3000:80"     # só localhost — nginx do host faz o proxy
 
 volumes:
   pgdata:
