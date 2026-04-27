@@ -20,8 +20,8 @@ api.interceptors.response.use(
 )
 
 // Auth
-export const login = (email, password) =>
-  api.post('/login', { email, password })
+export const login    = (email, password) => api.post('/login', { email, password })
+export const register = data              => api.post('/register', data)
 
 // Profile (authenticated user)
 export const getMe    = ()     => api.get('/me')

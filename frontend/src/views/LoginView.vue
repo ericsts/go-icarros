@@ -4,6 +4,7 @@
       <div class="login-logo">🚗 iCarros</div>
       <h1>Entrar na plataforma</h1>
 
+      <div v-if="registered" class="alert alert-success">Conta criada com sucesso! Faça login.</div>
       <div v-if="error" class="alert alert-error">{{ error }}</div>
 
       <form @submit.prevent="handleLogin">
@@ -19,21 +20,27 @@
           {{ loading ? 'Entrando...' : 'Entrar' }}
         </button>
       </form>
+
+      <p style="text-align:center;margin-top:20px;font-size:13px;color:#94a3b8">
+        Não tem conta? <router-link to="/register" style="color:#2563eb">Criar conta</router-link>
+      </p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useAuthStore } from '../stores/auth'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const auth   = useAuthStore()
 const router = useRouter()
+const route  = useRoute()
 
-const form    = reactive({ email: '', password: '' })
-const loading = ref(false)
-const error   = ref('')
+const form       = reactive({ email: '', password: '' })
+const loading    = ref(false)
+const error      = ref('')
+const registered = computed(() => route.query.registered === '1')
 
 async function handleLogin() {
   error.value   = ''
@@ -65,6 +72,15 @@ async function handleLogin() {
   width: 100%;
   max-width: 380px;
   box-shadow: 0 24px 80px rgba(0,0,0,.3);
+}
+.alert-success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 12px;
 }
 .login-logo {
   font-size: 28px;

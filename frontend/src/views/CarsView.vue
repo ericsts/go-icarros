@@ -55,6 +55,7 @@
         <div class="modal-body">
           <div v-if="formError" class="alert alert-error">{{ formError }}</div>
           <form @submit.prevent="save">
+            <!-- Dados do carro -->
             <div class="form-row">
               <div class="form-group">
                 <label>Marca</label>
@@ -76,19 +77,30 @@
               </div>
             </div>
 
-            <template v-if="!editingId">
-              <hr class="divider" />
-              <p style="font-size:13px;color:var(--text-light);margin-bottom:12px">Configurações do leilão</p>
-              <div class="form-row">
+            <!-- Seção de leilão -->
+            <hr class="divider" />
+            <label class="checkbox-label">
+              <input type="checkbox" v-model="form.start_auction" />
+              <span>{{ editingId ? 'Iniciar leilão para este carro' : 'Colocar em leilão agora' }}</span>
+            </label>
+
+            <template v-if="form.start_auction">
+              <div class="form-row" style="margin-top:12px">
                 <div class="form-group">
                   <label>Lance mínimo (R$)</label>
-                  <input v-model.number="form.min_bid" type="number" step="0.01" required />
+                  <input v-model.number="form.min_bid" type="number" step="0.01" required :min="0.01" />
                 </div>
                 <div class="form-group">
                   <label>Encerramento do leilão</label>
-                  <input v-model="form.auction_ends_at" type="datetime-local" required />
+                  <input
+                    v-model="form.auction_ends_at"
+                    type="datetime-local"
+                    required
+                    :min="minDateTime"
+                  />
                 </div>
               </div>
+              <p class="field-hint">A data de encerramento deve ser no futuro.</p>
             </template>
 
             <div class="modal-footer">
@@ -105,7 +117,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { getCars, createCar, updateCar, deleteCar } from '../api'
 import { formatCurrency } from '../utils'
 import { useAuthStore } from '../stores/auth'
@@ -120,7 +132,16 @@ const editingId = ref(null)
 const saving    = ref(false)
 const formError = ref('')
 
-const emptyForm = () => ({ marca: '', modelo: '', ano: new Date().getFullYear(), valor: '', min_bid: '', auction_ends_at: '' })
+const minDateTime = computed(() => {
+  const now = new Date()
+  now.setMinutes(now.getMinutes() + 1)
+  return now.toISOString().slice(0, 16)
+})
+
+const emptyForm = () => ({
+  marca: '', modelo: '', ano: new Date().getFullYear(), valor: '',
+  start_auction: false, min_bid: '', auction_ends_at: ''
+})
 const form = reactive(emptyForm())
 
 async function load() {
@@ -139,7 +160,10 @@ function openCreate() {
 }
 
 function openEdit(car) {
-  Object.assign(form, { marca: car.marca, modelo: car.modelo, ano: car.ano, valor: car.valor })
+  Object.assign(form, {
+    marca: car.marca, modelo: car.modelo, ano: car.ano, valor: car.valor,
+    start_auction: false, min_bid: '', auction_ends_at: ''
+  })
   editingId.value = car.id
   formError.value = ''
   showModal.value = true
@@ -151,15 +175,23 @@ async function save() {
   formError.value = ''
   saving.value    = true
   try {
+    const payload = {
+      marca: form.marca,
+      modelo: form.modelo,
+      ano: form.ano,
+      valor: form.valor,
+      start_auction: form.start_auction,
+    }
+    if (form.start_auction) {
+      payload.min_bid        = form.min_bid
+      payload.auction_ends_at = new Date(form.auction_ends_at).toISOString()
+    }
+
     if (editingId.value) {
-      const { data } = await updateCar(editingId.value, { marca: form.marca, modelo: form.modelo, ano: form.ano, valor: form.valor })
+      const { data } = await updateCar(editingId.value, payload)
       const i = cars.value.findIndex(c => c.id === editingId.value)
       if (i >= 0) cars.value[i] = data
     } else {
-      const payload = {
-        ...form,
-        auction_ends_at: new Date(form.auction_ends_at).toISOString()
-      }
       const { data } = await createCar(payload)
       cars.value.unshift(data)
     }
@@ -181,3 +213,26 @@ async function handleDelete(id) {
 
 onMounted(load)
 </script>
+
+<style scoped>
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text);
+  margin-top: 4px;
+}
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+.field-hint {
+  font-size: 12px;
+  color: var(--text-light);
+  margin: 4px 0 0;
+}
+</style>

@@ -46,7 +46,7 @@
         <!-- Coluna esquerda: dar lance + feed ao vivo -->
         <div>
           <!-- Formulário de lance -->
-          <div v-if="auction.status === 'open'" class="card" style="margin-bottom:16px">
+          <div v-if="isActive" class="card" style="margin-bottom:16px">
             <h2 style="font-size:16px;font-weight:600;margin-bottom:16px">Dar um lance</h2>
             <div v-if="bidError" class="alert alert-error">{{ bidError }}</div>
             <div v-if="bidSuccess" class="alert alert-success">Lance enviado com sucesso!</div>
@@ -151,6 +151,10 @@ const minBid = computed(() => {
     : auction.value?.min_bid ?? 0
 })
 
+const isActive = computed(() =>
+  auction.value?.status === 'open' && new Date(auction.value.ends_at) > new Date()
+)
+
 async function loadData() {
   try {
     const [aRes, bRes] = await Promise.all([getAuction(id), getBids(id)])
@@ -186,7 +190,7 @@ async function submitBid() {
 }
 
 function connectWS() {
-  if (auction.value?.status !== 'open') return
+  if (!isActive.value) return
   const proto = location.protocol === 'https:' ? 'wss:' : 'ws:'
   ws = new WebSocket(`${proto}//${location.host}/ws/auctions/${id}?token=${auth.token}`)
   ws.onopen  = () => { wsConnected.value = true }
