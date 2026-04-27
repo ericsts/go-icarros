@@ -43,6 +43,25 @@ func (s *UserService) Update(user *models.User) error {
 	return s.Repo.Update(user)
 }
 
+func (s *UserService) UpdateProfile(user *models.User, newPassword string) error {
+	current, err := s.Repo.FindByID(user.ID)
+	if err != nil {
+		return err
+	}
+	user.Role = current.Role
+	if err := s.Repo.Update(user); err != nil {
+		return err
+	}
+	if newPassword != "" {
+		hashed, err := bcrypt.GenerateFromPassword([]byte(newPassword), 14)
+		if err != nil {
+			return err
+		}
+		return s.Repo.UpdatePassword(user.ID, string(hashed))
+	}
+	return nil
+}
+
 func (s *UserService) Delete(id int) error {
 	return s.Repo.Delete(id)
 }

@@ -15,6 +15,7 @@ type UserSvc interface {
 	GetAll() ([]models.User, error)
 	GetByID(id int) (*models.User, error)
 	Update(user *models.User) error
+	UpdateProfile(user *models.User, newPassword string) error
 	Delete(id int) error
 }
 

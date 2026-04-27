@@ -10,25 +10,27 @@ import (
 )
 
 type mockUserRepo struct {
-	createErr       error
-	findByEmailUser *models.User
-	findByEmailErr  error
-	findAllUsers    []models.User
-	findAllErr      error
-	findByIDUser    *models.User
-	findByIDErr     error
-	updateErr       error
-	deleteErr       error
+	createErr          error
+	findByEmailUser    *models.User
+	findByEmailErr     error
+	findAllUsers       []models.User
+	findAllErr         error
+	findByIDUser       *models.User
+	findByIDErr        error
+	updateErr          error
+	updatePasswordErr  error
+	deleteErr          error
 }
 
 func (m *mockUserRepo) Create(_ *models.User) error { return m.createErr }
 func (m *mockUserRepo) FindByEmail(_ string) (*models.User, error) {
 	return m.findByEmailUser, m.findByEmailErr
 }
-func (m *mockUserRepo) FindAll() ([]models.User, error)      { return m.findAllUsers, m.findAllErr }
-func (m *mockUserRepo) FindByID(_ int) (*models.User, error) { return m.findByIDUser, m.findByIDErr }
-func (m *mockUserRepo) Update(_ *models.User) error          { return m.updateErr }
-func (m *mockUserRepo) Delete(_ int) error                   { return m.deleteErr }
+func (m *mockUserRepo) FindAll() ([]models.User, error)             { return m.findAllUsers, m.findAllErr }
+func (m *mockUserRepo) FindByID(_ int) (*models.User, error)        { return m.findByIDUser, m.findByIDErr }
+func (m *mockUserRepo) Update(_ *models.User) error                 { return m.updateErr }
+func (m *mockUserRepo) UpdatePassword(_ int, _ string) error        { return m.updatePasswordErr }
+func (m *mockUserRepo) Delete(_ int) error                          { return m.deleteErr }
 
 func TestUserService_Register_HashaSenha(t *testing.T) {
 	svc := &UserService{Repo: &mockUserRepo{}}

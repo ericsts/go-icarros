@@ -74,6 +74,9 @@ func RegisterRoutes(r *gin.Engine, d Deps) {
 	auth := r.Group("/")
 	auth.Use(middleware.AuthMiddleware())
 	{
+		auth.GET("/me", userH.GetMe)
+		auth.PUT("/me", userH.UpdateMe)
+
 		auth.POST("/cars", carH.Create)
 		auth.GET("/cars", carH.List)
 		auth.GET("/cars/my", carH.GetMyCars)

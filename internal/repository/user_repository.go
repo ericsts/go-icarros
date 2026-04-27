@@ -20,9 +20,9 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 	var user models.User
 
 	err := r.DB.QueryRow(
-		"SELECT id, password, role FROM users WHERE email=$1",
+		"SELECT id, name, email, password, role FROM users WHERE email=$1",
 		email,
-	).Scan(&user.ID, &user.Password, &user.Role)
+	).Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.Role)
 
 	return &user, err
 }
@@ -58,6 +58,11 @@ func (r *UserRepository) Update(user *models.User) error {
 		"UPDATE users SET name=$1, email=$2, role=$3 WHERE id=$4",
 		user.Name, user.Email, user.Role, user.ID,
 	)
+	return err
+}
+
+func (r *UserRepository) UpdatePassword(id int, hashedPassword string) error {
+	_, err := r.DB.Exec("UPDATE users SET password=$1 WHERE id=$2", hashedPassword, id)
 	return err
 }
 

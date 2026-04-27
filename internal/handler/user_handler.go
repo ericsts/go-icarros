@@ -33,7 +33,13 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
+		"id":    user.ID,
+		"name":  user.Name,
+		"email": user.Email,
+		"role":  user.Role,
+	})
 }
 
 func (h *UserHandler) Create(c *gin.Context) {
@@ -96,6 +102,40 @@ func (h *UserHandler) Update(c *gin.Context) {
 		return
 	}
 
+	c.JSON(http.StatusOK, user)
+}
+
+func (h *UserHandler) GetMe(c *gin.Context) {
+	id := c.GetInt("user_id")
+	user, err := h.Service.GetByID(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "usuário não encontrado"})
+		return
+	}
+	user.Password = ""
+	c.JSON(http.StatusOK, user)
+}
+
+func (h *UserHandler) UpdateMe(c *gin.Context) {
+	id := c.GetInt("user_id")
+
+	var input struct {
+		Name     string `json:"name"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	if err := c.BindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user := &models.User{ID: id, Name: input.Name, Email: input.Email}
+	if err := h.Service.UpdateProfile(user, input.Password); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	user.Password = ""
 	c.JSON(http.StatusOK, user)
 }
 

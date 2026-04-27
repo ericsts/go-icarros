@@ -10,6 +10,7 @@ type UserRepo interface {
 	FindAll() ([]models.User, error)
 	FindByID(id int) (*models.User, error)
 	Update(user *models.User) error
+	UpdatePassword(id int, hashedPassword string) error
 	Delete(id int) error
 }
 

@@ -40,10 +40,10 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 	}
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"id", "password", "role"}).
-		AddRow(1, "hashsenha", "admin")
+	rows := sqlmock.NewRows([]string{"id", "name", "email", "password", "role"}).
+		AddRow(1, "Eric", "eric@test.com", "hashsenha", "admin")
 
-	mock.ExpectQuery("SELECT id, password, role FROM users WHERE email").
+	mock.ExpectQuery("SELECT id, name, email, password, role FROM users WHERE email").
 		WithArgs("eric@test.com").
 		WillReturnRows(rows)
 
@@ -55,6 +55,9 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 	}
 	if user.ID != 1 {
 		t.Errorf("esperado ID=1, obtido %d", user.ID)
+	}
+	if user.Name != "Eric" {
+		t.Errorf("esperado name=Eric, obtido %s", user.Name)
 	}
 	if user.Role != "admin" {
 		t.Errorf("esperado role=admin, obtido %s", user.Role)

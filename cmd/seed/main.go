@@ -13,7 +13,7 @@ var seeds = []models.User{
 	{
 		Name:     "Eric Santos",
 		Email:    "ericsts@gmail.com",
-		Password: "admin123",
+		Password: "q1w2e3r4t5",
 		Role:     "admin",
 	},
 }
