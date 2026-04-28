@@ -20,6 +20,12 @@ jobs:
             set -e
             cd /opt/go-icarros
             git pull origin main
+
+            # Atualiza site estático (ericsantos.eu)
+            sudo cp -r site/* /var/www/ericsantos.eu/
+
+            # Rebuild e reinício dos containers
             docker compose -f docker-compose.prod.yml up --build -d
             docker image prune -f
+
             echo "✅ Deploy concluído em $(date)"
