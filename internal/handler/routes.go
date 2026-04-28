@@ -2,6 +2,7 @@ package handler
 
 import (
 	"database/sql"
+	"net/http"
 
 	"go-icarros/internal/middleware"
 	"go-icarros/internal/repository"
@@ -53,6 +54,9 @@ func RegisterRoutes(r *gin.Engine, d Deps) {
 
 	// --- websocket ---
 	wsH := &WSHandler{Hub: d.Hub}
+
+	// health check
+	r.GET("/health", func(c *gin.Context) { c.Status(http.StatusOK) })
 
 	// rotas públicas
 	r.POST("/login", userH.Login)
