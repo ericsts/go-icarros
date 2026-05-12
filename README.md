@@ -363,7 +363,7 @@ Clientes são agrupados por sala (`auction_id`) e apenas recebem mensagens — o
 | GET | `/auctions/:id/bids` | autenticado | lances de um leilão |
 | GET | `/ws/auctions/:id?token=` | token via query | WebSocket — lances ao vivo |
 
-## Erros comuns
+## Erros comun
 
 | Status | Significado |
 |--------|-------------|
